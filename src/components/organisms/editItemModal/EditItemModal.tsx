@@ -8,19 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-interface Item {
-  id: number;
-  name: string;
-  price: number;
-  barcode: string;
-}
+import { CartListItem } from "../../../core/types";
 
 interface Props {
-  item: Item;
+  item: CartListItem;
   visible: boolean;
   onClose: () => void;
-  onSubmit: (item: Item) => void;
+  onSubmit: (item: CartListItem) => void;
 }
 
 const EditItemModal: React.FC<Props> = ({
@@ -31,14 +25,14 @@ const EditItemModal: React.FC<Props> = ({
 }) => {
   const [name, setName] = useState(item.name);
   const [price, setPrice] = useState(item.price.toString());
-  const [barcode, setBarcode] = useState(item.barcode);
+  const [barcodeData, setBarcodeData] = useState(item.barcodeData);
 
   const handleSubmit = () => {
-    const updatedItem: Item = {
+    const updatedItem: CartListItem = {
       ...item,
       name,
       price: parseFloat(price),
-      barcode,
+      barcodeData,
     };
     onSubmit(updatedItem);
     onClose();
@@ -65,8 +59,8 @@ const EditItemModal: React.FC<Props> = ({
           <TextInput
             style={styles.input}
             placeholder="Barcode"
-            value={barcode}
-            onChangeText={setBarcode}
+            value={barcodeData}
+            onChangeText={setBarcodeData}
           />
           <View style={styles.buttonContainer}>
             <Button title="Cancel" onPress={onClose} />

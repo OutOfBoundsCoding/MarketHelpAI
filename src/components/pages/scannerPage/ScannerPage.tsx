@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Modal, TextInput, Button } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import { getItemByBarcode } from "../../../core/database/Database";
 import useItemStore from "../../../core/context/ItemsStore";
+import useInventoryStore from "../../../core/context/InventoryStore";
 
 const ScannerPage: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -12,6 +12,10 @@ const ScannerPage: React.FC = () => {
   const [itemName, setItemName] = useState<string>("");
   const [itemPrice, setItemPrice] = useState<string>("");
   const addItem = useItemStore((state) => state.addItem);
+  const findItemByBarcode = useInventoryStore(
+    (state) => state.findItemByBarcode
+  );
+  const storeToInventory = useInventoryStore((state) => state.storeItem);
 
   useEffect(() => {
     (async () => {
@@ -27,18 +31,18 @@ const ScannerPage: React.FC = () => {
     type: string;
     data: string;
   }) => {
+    console.log(data);
     let barcodeResult = data;
-    try {
-      const result = await getItemByBarcode(data);
-    } catch (error) {
-      console.log(error);
+    const result = findItemByBarcode(data);
+    console.log(result);
+    if (result) {
+      setBarcodeData(result.barcodeData);
+      setItemName(result.name);
+      setItemPrice(result.price.toString());
+    } else {
+      setBarcodeData(barcodeResult);
     }
-    if (result !== null) {
-      barcodeResult = result.barcodeData;
-    }
-
     setScanned(true);
-    setBarcodeData(barcodeResult);
     setModalVisible(true);
   };
 
@@ -47,7 +51,6 @@ const ScannerPage: React.FC = () => {
       `Scanned data: ${barcodeData}, Item name: ${itemName}, Item price: ${itemPrice}`
     );
     addItem({
-      id: barcodeData,
       barcodeData: barcodeData,
       name: itemName,
       price: parseFloat(itemPrice),
@@ -58,6 +61,17 @@ const ScannerPage: React.FC = () => {
     setBarcodeData("");
     setItemName("");
     setItemPrice("");
+  };
+
+  const handleInventoryStore = () => {
+    console.log(
+      `Scanned data: ${barcodeData}, Item name: ${itemName}, Item price: ${itemPrice}`
+    );
+    storeToInventory({
+      barcodeData: barcodeData,
+      name: itemName,
+      price: parseFloat(itemPrice),
+    });
   };
 
   const handleCancel = () => {
@@ -106,6 +120,7 @@ const ScannerPage: React.FC = () => {
             keyboardType="numeric"
           />
           <Button title="Log to console" onPress={handleSubmit} />
+          <Button title="Store to Inventory" onPress={handleInventoryStore} />
           <Button title="Cancel" onPress={handleCancel} />
         </View>
       </Modal>

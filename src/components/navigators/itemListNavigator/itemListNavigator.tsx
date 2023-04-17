@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import CreateItemPage from "../../pages/createItemPage/CreateItemPage";
 import CartPage from "../../pages/cartPage/CartPage";
-import InvventoryView from "../../organisms/inventoryView/InventoryView";
+import InventoryView from "../../organisms/inventoryView/InventoryView";
 import ScannerPage from "../../pages/scannerPage/ScannerPage";
 
 const Stack = createStackNavigator();
@@ -26,7 +26,7 @@ const ItemListNavigator: React.FC = () => {
       <Stack.Navigator initialRouteName="Home">
         {/* <Stack.Screen name="Home" component={HomePage} /> */}
         <Stack.Screen name="Items" component={CartPage} />
-        <Stack.Screen name="Inventory" component={InvventoryView} />
+        <Stack.Screen name="Inventory" component={InventoryView} />
         <Stack.Screen name="Scanner" component={ScannerPage} />
         <Stack.Screen name="CreateItem" component={CreateItemPage} />
       </Stack.Navigator>

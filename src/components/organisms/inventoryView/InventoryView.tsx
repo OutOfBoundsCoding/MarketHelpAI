@@ -6,36 +6,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Item } from "../../../core/types/Item";
 import EditItemModal from "../editItemModal/EditItemModal";
+import { CartListItem } from "../../../core/types";
 
-const ITEMS: Item[] = [
-  {
-    id: 1,
-    name: "Item 1",
-    price: 9.99,
-    barcode: "1234567890",
-  },
-  {
-    id: 2,
-    name: "Item 2",
-    price: 19.99,
-    barcode: "0987654321",
-  },
-  {
-    id: 3,
-    name: "Item 3",
-    price: 29.99,
-    barcode: "1357924680",
-  },
-];
-
-const InvventoryView: React.FC = () => {
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+const InventoryView: React.FC = () => {
+  const [selectedItem, setSelectedItem] = useState<CartListItem | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [items, setItems] = useState<Item[]>(ITEMS);
+  const [items, setItems] = useState<CartListItem[]>([]);
 
-  const handleEditItem = (item: Item) => {
+  const handleEditItem = (item: CartListItem) => {
     setSelectedItem(item);
     setIsModalVisible(true);
   };
@@ -45,21 +24,23 @@ const InvventoryView: React.FC = () => {
     setSelectedItem(null);
   };
 
-  const handleSaveItem = (updatedItem: Item) => {
+  const handleSaveItem = (updatedItem: CartListItem) => {
     const newItems = [...items];
-    const index = newItems.findIndex((item) => item.id === updatedItem.id);
+    const index = newItems.findIndex(
+      (item) => item.barcodeData === updatedItem.barcodeData
+    );
     newItems[index] = updatedItem;
     setItems(newItems);
   };
 
-  const renderItem = ({ item }: { item: Item }) => (
+  const renderItem = ({ item }: { item: CartListItem }) => (
     <TouchableOpacity
       style={styles.itemContainer}
       onPress={() => handleEditItem(item)}
     >
       <Text style={styles.itemName}>{item.name}</Text>
       <Text style={styles.itemPrice}>{`$${item.price.toFixed(2)}`}</Text>
-      <Text style={styles.itemBarcode}>{item.barcode}</Text>
+      <Text style={styles.itemBarcode}>{item.barcodeData}</Text>
     </TouchableOpacity>
   );
 
@@ -68,11 +49,18 @@ const InvventoryView: React.FC = () => {
       <FlatList
         data={items}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, i) => i.toString()}
         style={styles.list}
       />
       <EditItemModal
-        item={selectedItem ?? ITEMS[0]}
+        item={
+          selectedItem ?? {
+            barcodeData: "",
+            name: "",
+            price: 0,
+            quantity: 0,
+          }
+        }
         visible={isModalVisible}
         onClose={handleModalClose}
         onSubmit={handleSaveItem}
@@ -112,4 +100,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InvventoryView;
+export default InventoryView;
