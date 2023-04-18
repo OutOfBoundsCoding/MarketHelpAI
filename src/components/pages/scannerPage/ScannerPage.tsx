@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Modal, TextInput, Button } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import useItemStore from "../../../core/context/ItemsStore";
+import useCartStore from "../../../core/context/CartStore";
 import useInventoryStore from "../../../core/context/InventoryStore";
 
-const ScannerPage: React.FC = () => {
+const ScannerPage: React.FC<{ navigation }> = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [barcodeData, setBarcodeData] = useState<string>("");
   const [itemName, setItemName] = useState<string>("");
   const [itemPrice, setItemPrice] = useState<string>("");
-  const addItem = useItemStore((state) => state.addItem);
+  const addItem = useCartStore((state) => state.addItem);
   const findItemByBarcode = useInventoryStore(
     (state) => state.findItemByBarcode
   );
@@ -47,9 +47,6 @@ const ScannerPage: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    console.log(
-      `Scanned data: ${barcodeData}, Item name: ${itemName}, Item price: ${itemPrice}`
-    );
     addItem({
       barcodeData: barcodeData,
       name: itemName,
@@ -61,6 +58,7 @@ const ScannerPage: React.FC = () => {
     setBarcodeData("");
     setItemName("");
     setItemPrice("");
+    navigation.goBack();
   };
 
   const handleInventoryStore = () => {
@@ -119,7 +117,7 @@ const ScannerPage: React.FC = () => {
             value={itemPrice}
             keyboardType="numeric"
           />
-          <Button title="Log to console" onPress={handleSubmit} />
+          <Button title="Add to cart" onPress={handleSubmit} />
           <Button title="Store to Inventory" onPress={handleInventoryStore} />
           <Button title="Cancel" onPress={handleCancel} />
         </View>

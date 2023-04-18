@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { CartListItem } from "../../../core/types";
+import { InventoryItem } from "../../../core/types";
 
 interface Props {
-  item: CartListItem;
+  item: InventoryItem;
   visible: boolean;
   onClose: () => void;
-  onSubmit: (item: CartListItem) => void;
+  onSubmit: (item: InventoryItem) => void;
+  onDelete: (barcodeToDelete: string) => void;
 }
 
 const EditItemModal: React.FC<Props> = ({
@@ -22,19 +23,25 @@ const EditItemModal: React.FC<Props> = ({
   visible,
   onClose,
   onSubmit,
+  onDelete,
 }) => {
   const [name, setName] = useState(item.name);
   const [price, setPrice] = useState(item.price.toString());
   const [barcodeData, setBarcodeData] = useState(item.barcodeData);
 
   const handleSubmit = () => {
-    const updatedItem: CartListItem = {
+    const updatedItem: InventoryItem = {
       ...item,
       name,
       price: parseFloat(price),
       barcodeData,
     };
     onSubmit(updatedItem);
+    onClose();
+  };
+
+  const handleDelete = () => {
+    onDelete(barcodeData);
     onClose();
   };
 
@@ -66,6 +73,14 @@ const EditItemModal: React.FC<Props> = ({
             <Button title="Cancel" onPress={onClose} />
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleDelete}
+            >
+              <Text style={styles.buttonText}>Delete</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -108,6 +123,11 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+  },
+  deleteButton: {
+    backgroundColor: "red",
     padding: 10,
     borderRadius: 5,
   },

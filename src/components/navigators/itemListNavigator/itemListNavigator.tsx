@@ -23,7 +23,7 @@ const HomePage: React.FC<{ navigation: any }> = ({ navigation }) => {
 const ItemListNavigator: React.FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Items">
         {/* <Stack.Screen name="Home" component={HomePage} /> */}
         <Stack.Screen name="Items" component={CartPage} />
         <Stack.Screen name="Inventory" component={InventoryView} />

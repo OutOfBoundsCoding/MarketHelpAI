@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
-import { CartListItem } from "../../../core/context/ItemsStore";
+import useCartStore, { CartListItem } from "../../../core/context/CartStore";
 
 const CartItem: React.FC<CartListItem> = ({
   id,
@@ -10,12 +10,24 @@ const CartItem: React.FC<CartListItem> = ({
   quantity,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const removeItem = useCartStore((state) => state.removeItem);
+  const reduceQuantityOfItem = useCartStore(
+    (state) => state.decreaseItemQuantity
+  );
+
+  const handleRemove = (barcode: string) => {
+    removeItem(barcode);
+    setModalVisible(false);
+  };
+  const handleReduceQuantity = (barcode: string) => {
+    reduceQuantityOfItem(barcode);
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.cartItem}>
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Text style={styles.itemTitle}>{name}</Text>
-        <Text style={styles.itemDetails}>SKU: {id}</Text>
         <Text style={styles.itemDetails}>Barcode: {barcodeData}</Text>
         <Text style={styles.itemDetails}>Price: ${price.toFixed(2)}</Text>
         <Text style={styles.itemDetails}>Quantity: {quantity}</Text>
@@ -27,10 +39,11 @@ const CartItem: React.FC<CartListItem> = ({
       >
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>{name}</Text>
-          <TouchableOpacity onPress={() => {}}>
+          <Text style={styles.modalTitle}>{barcodeData}</Text>
+          <TouchableOpacity onPress={() => handleReduceQuantity(barcodeData)}>
             <Text style={styles.modalOption}>Reduce Quantity</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => handleRemove(barcodeData)}>
             <Text style={styles.modalOption}>Remove Item</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setModalVisible(false)}>

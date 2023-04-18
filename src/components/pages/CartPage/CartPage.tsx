@@ -2,63 +2,53 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import CartItem from "../../molecules/cartItem/CartItem";
 import FloatingControls from "../../molecules/floatingControls/FloatingControls";
-import useItemStore from "../../../core/context/ItemsStore";
+import useCartStore from "../../../core/context/CartStore";
+import { css } from "@emotion/native";
 
 const CartPage: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const clearCart = useCartStore((state) => state.clearCart);
   const buttons = [
     {
-      icon: "add",
+      icon: "cleaning-services",
+      onPress: () => clearCart(),
+    },
+    {
+      icon: "create",
       onPress: () => navigation.navigate("CreateItem"),
     },
     {
-      icon: "edit",
+      icon: "inventory",
       onPress: () => navigation.navigate("Inventory"),
     },
     {
-      icon: "delete",
+      icon: "qr-code",
       onPress: () => navigation.navigate("Scanner"),
     },
   ];
-  // const cartItems: CartItemType[] = [
-  //   {
-  //     title: "Item 1",
-  //     sku: "A123",
-  //     barcode: "123456789",
-  //     price: 10.99,
-  //     quantity: 1,
-  //   },
-  //   {
-  //     title: "Item 2",
-  //     sku: "B456",
-  //     barcode: "987654321",
-  //     price: 5.99,
-  //     quantity: 3,
-  //   },
-  //   {
-  //     title: "Item 3",
-  //     sku: "C789",
-  //     barcode: "456123789",
-  //     price: 2.99,
-  //     quantity: 2,
-  //   },
-  // ];
 
-  const cartItems = useItemStore((state) => state.items);
-  const totalCost = useItemStore((state) => state.getTotalCost);
+  const cartItems = useCartStore((state) => state.items);
+  const totalCost = useCartStore((state) => state.getTotalCost);
 
   return (
     <View style={styles.screen}>
-      {cartItems.map((item) => (
+      {cartItems.map((item, i) => (
         <CartItem
-          key={item.id}
+          key={i}
           name={item.name}
-          id={item.id}
+          id={`item${i}`}
           barcodeData={item.barcodeData}
           price={item.price}
           quantity={item.quantity}
         />
       ))}
-      <Text>{totalCost()}</Text>
+      <Text
+        style={css`
+          font-size: 26px;
+          margin: 20px;
+        `}
+      >
+        {totalCost()}
+      </Text>
       <FloatingControls buttons={buttons} />
     </View>
   );
