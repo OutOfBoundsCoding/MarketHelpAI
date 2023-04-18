@@ -106,20 +106,15 @@ const getItemByBarcode = async (barcode: string) => {
   });
 };
 
-const updateItemByBarcode = async (
-  barcode: string,
-  name: string,
-  price: number,
-  quantity: number
-) => {
+const updateItemByBarcode = async (item: InventoryItem) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
         SQL_STATEMENT.UPDATE_ITEM_BY_BARCODE,
-        [name, price, quantity, barcode],
+        [item.name, item.price, item.barcodeData],
         (_, result) => resolve(result.rowsAffected),
         (_, error) => {
-          reject(null);
+          reject(error);
           return false;
         }
       );
@@ -135,7 +130,7 @@ const deleteItemByBarcode = async (barcode: string) => {
         [barcode],
         (_, result) => resolve(result.rowsAffected),
         (_, error) => {
-          reject(null);
+          reject(error);
           return false;
         }
       );

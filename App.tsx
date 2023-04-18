@@ -14,12 +14,12 @@ import {
 import useInventoryStore from "./src/core/context/InventoryStore";
 
 export default function App() {
-  const storeItems = useInventoryStore((state) => state.storeItems);
+  const initializeItems = useInventoryStore((state) => state.initializeItems);
   const initializeInventory = async () => {
     // await removeTable();
     await initializeDB();
     const dbItems = await selectAllItems();
-    storeItems(dbItems);
+    initializeItems(dbItems);
     console.log(dbItems);
   };
   useEffect(() => {

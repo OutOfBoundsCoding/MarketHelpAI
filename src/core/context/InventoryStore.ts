@@ -1,13 +1,20 @@
 import { create } from "zustand";
 import { InventoryItem } from "../types";
-import { insertItem } from "../database/Database";
+import {
+  deleteItemByBarcode,
+  insertItem,
+  selectAllItems,
+  updateItemByBarcode,
+} from "../database/Database";
 
 type ItemState = {
   inventory: InventoryItem[];
   findItemByBarcode: (barcodeToFind: string) => InventoryItem;
   getAllItems: () => InventoryItem[];
-  storeItems: (items: InventoryItem[]) => void;
+  initializeItems: (items: InventoryItem[]) => void;
   storeItem: (items: InventoryItem) => void;
+  updateItem: (items: InventoryItem) => void;
+  deleteItem: (barcodeToDelete: string) => void;
 };
 
 const useInventoryStore = create<ItemState>((set, get) => ({
@@ -18,11 +25,23 @@ const useInventoryStore = create<ItemState>((set, get) => ({
   getAllItems: (): InventoryItem[] => {
     return get().inventory;
   },
-  storeItems: (items: InventoryItem[]) => {
+  initializeItems: (items: InventoryItem[]) => {
     set({ inventory: items });
   },
-  storeItem: (item: InventoryItem) => {
-    insertItem(item).catch((e) => console.log(e));
+  storeItem: async (item: InventoryItem) => {
+    await insertItem(item);
+    var updatedItemList = await selectAllItems();
+    set({ inventory: updatedItemList });
+  },
+  updateItem: async (item: InventoryItem) => {
+    await updateItemByBarcode(item);
+    var updatedItemList = await selectAllItems();
+    set({ inventory: updatedItemList });
+  },
+  deleteItem: async (barcodeToDelete: string) => {
+    await deleteItemByBarcode(barcodeToDelete);
+    var updatedItemList = await selectAllItems();
+    set({ inventory: updatedItemList });
   },
 }));
 
