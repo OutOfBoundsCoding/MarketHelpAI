@@ -1,41 +1,28 @@
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, Button } from "react-native";
-
-interface Item {
-  sku: string;
-  barcode: string;
-  price: number;
-  name: string;
-}
+import { InventoryItem } from "../../../core/types";
+import useInventoryStore from "../../../core/context/InventoryStore";
 
 const CreateItemPage: React.FC = () => {
-  const [item, setItem] = useState<Item>({
-    sku: "",
-    barcode: "",
+  const createInventoryItem = useInventoryStore((state) => state.storeItem);
+  const [item, setItem] = useState<InventoryItem>({
+    barcodeData: "",
     price: 0,
     name: "",
   });
 
   const handleCreateItem = () => {
-    // Do something with the created item, like send it to a database
-    console.log(item);
-    // Reset the state to clear the form
-    setItem({ sku: "", barcode: "", price: 0, name: "" });
+    createInventoryItem(item);
+    setItem({ barcodeData: "", price: 0, name: "" });
   };
 
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        placeholder="SKU"
-        value={item.sku}
-        onChangeText={(value) => setItem({ ...item, sku: value })}
-      />
-      <TextInput
-        style={styles.input}
         placeholder="Barcode"
-        value={item.barcode}
-        onChangeText={(value) => setItem({ ...item, barcode: value })}
+        value={item.barcodeData}
+        onChangeText={(value) => setItem({ ...item, barcodeData: value })}
       />
       <TextInput
         style={styles.input}

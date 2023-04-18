@@ -7,14 +7,18 @@ import {
   View,
 } from "react-native";
 import EditItemModal from "../editItemModal/EditItemModal";
-import { CartListItem } from "../../../core/types";
+import { InventoryItem } from "../../../core/types";
+import useInventoryStore from "../../../core/context/InventoryStore";
 
 const InventoryView: React.FC = () => {
-  const [selectedItem, setSelectedItem] = useState<CartListItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [items, setItems] = useState<CartListItem[]>([]);
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const inventory = useInventoryStore((state) => state.inventory);
+  const deleteInventoryItem = useInventoryStore((state) => state.deleteItem);
+  const updateInventoryItem = useInventoryStore((state) => state.updateItem);
 
-  const handleEditItem = (item: CartListItem) => {
+  const handleEditItem = (item: InventoryItem) => {
     setSelectedItem(item);
     setIsModalVisible(true);
   };
@@ -24,16 +28,15 @@ const InventoryView: React.FC = () => {
     setSelectedItem(null);
   };
 
-  const handleSaveItem = (updatedItem: CartListItem) => {
-    const newItems = [...items];
-    const index = newItems.findIndex(
-      (item) => item.barcodeData === updatedItem.barcodeData
-    );
-    newItems[index] = updatedItem;
-    setItems(newItems);
+  const handleSaveItem = (updatedItem: InventoryItem) => {
+    updateInventoryItem(updatedItem);
   };
 
-  const renderItem = ({ item }: { item: CartListItem }) => (
+  const handleDelete = (barcodeToDelete: string) => {
+    deleteInventoryItem(barcodeToDelete);
+  };
+
+  const renderItem = ({ item }: { item: InventoryItem }) => (
     <TouchableOpacity
       style={styles.itemContainer}
       onPress={() => handleEditItem(item)}
@@ -47,24 +50,26 @@ const InventoryView: React.FC = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={items}
+        data={inventory}
         renderItem={renderItem}
         keyExtractor={(item, i) => i.toString()}
         style={styles.list}
       />
-      <EditItemModal
-        item={
-          selectedItem ?? {
-            barcodeData: "",
-            name: "",
-            price: 0,
-            quantity: 0,
+      {selectedItem && (
+        <EditItemModal
+          item={
+            selectedItem ?? {
+              barcodeData: "",
+              name: "",
+              price: 0,
+            }
           }
-        }
-        visible={isModalVisible}
-        onClose={handleModalClose}
-        onSubmit={handleSaveItem}
-      />
+          visible={isModalVisible}
+          onClose={handleModalClose}
+          onSubmit={handleSaveItem}
+          onDelete={handleDelete}
+        />
+      )}
     </View>
   );
 };
